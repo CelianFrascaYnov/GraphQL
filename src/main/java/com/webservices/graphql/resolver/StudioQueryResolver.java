@@ -6,19 +6,25 @@ import com.webservices.graphql.model.Studios;
 import com.webservices.graphql.service.StudioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 @Component
+@Controller
 @RequiredArgsConstructor
 public class StudioQueryResolver implements GraphQLQueryResolver {
 
     private final StudioService studioService;
 
-    public Studios studios(Integer page) {
+    @QueryMapping
+    public Studios studios(@Argument Integer page) {
         return studioService.findStudios(page);
     }
 
-    public Studio studio(String id) throws ChangeSetPersister.NotFoundException {
+    @QueryMapping
+    public Studio studio(@Argument String id) throws ChangeSetPersister.NotFoundException {
         return studioService.findStudioById(id);
     }
 }

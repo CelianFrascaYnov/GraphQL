@@ -3,7 +3,10 @@ package com.webservices.graphql.service;
 import com.webservices.graphql.model.Editor;
 import com.webservices.graphql.model.Editors;
 import com.webservices.graphql.model.Infos;
+import com.webservices.graphql.model.POJO.editor.CreateEditorInput;
+import com.webservices.graphql.model.POJO.editor.UpdateEditorInput;
 import com.webservices.graphql.repository.EditorRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
@@ -42,5 +45,23 @@ public class EditorService {
         // Recherche d'un éditeur par ID.
         Optional<Editor> editor = editorRepository.findById(id);
         return editor.orElseThrow(ChangeSetPersister.NotFoundException::new);
+    }
+
+    public Editor createEditor(CreateEditorInput input) {
+        Editor editor = new Editor();
+        editor.setName(input.getName());
+        return editorRepository.save(editor);
+    }
+
+    public Editor updateEditor(String id, UpdateEditorInput input) {
+        Editor editor = editorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Editor not found"));
+        editor.setName(input.getName());
+        return editorRepository.save(editor);
+    }
+
+    public boolean deleteEditor(String id) {
+        Editor editor = editorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Editor not found"));
+        editorRepository.delete(editor);
+        return true;
     }
 }
