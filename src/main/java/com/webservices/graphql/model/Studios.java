@@ -7,7 +7,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Games {
+public class Studios {
     private Infos infos;
-    private List<Game> results;
+    private List<Studio> results;
 }
