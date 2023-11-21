@@ -70,6 +70,8 @@ input CreateGameInput {
     genres: [String!]!
     publicationDate: Int
     platform: [String!]!
+    editorIds: [String!]!
+    studioIds: [String!]!
 }
 
 input UpdateGameInput {

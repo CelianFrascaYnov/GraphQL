@@ -9,4 +9,6 @@ public class CreateGameInput {
     private List<String> genres;
     private Integer publicationDate;
     private List<String> platform;
+    private List<String> editorIds;
+    private List<String> studioIds;
 }

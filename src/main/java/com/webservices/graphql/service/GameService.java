@@ -1,21 +1,22 @@
 package com.webservices.graphql.service;
 
-import com.webservices.graphql.model.Game;
-import com.webservices.graphql.model.Games;
-import com.webservices.graphql.model.Infos;
+import com.webservices.graphql.model.*;
 import com.webservices.graphql.model.POJO.game.CreateGameInput;
 import com.webservices.graphql.model.POJO.game.UpdateGameInput;
+import com.webservices.graphql.repository.EditorRepository;
 import com.webservices.graphql.repository.GameRepository;
+import com.webservices.graphql.repository.StudioRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +24,8 @@ import java.util.Optional;
 public class GameService {
 
     private final GameRepository gameRepository;
+    private final EditorRepository editorRepository;
+    private final StudioRepository studioRepository;
     private static final Logger log = LoggerFactory.getLogger(GameService.class);
 
     public Games findGames(Integer page, String genre, String platform, String studio) {
@@ -44,33 +47,28 @@ public class GameService {
         return games;
     }
 
-    public Game findGameById(String id)  {
+    public Game findGameById(String id) {
         return gameRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Game not found"));
     }
 
+    @Transactional
     public Game createGame(CreateGameInput input) {
-        log.info("Creating a new game with name: {}", input.getName());
-        try {
-            Game game = new Game();
-            game.setName(input.getName());
-            game.setGenres(input.getGenres());
-            game.setPublicationDate(input.getPublicationDate());
-            game.setPlatform(input.getPlatform());
-            // Assurez-vous que toutes les données nécessaires sont fournies
-            if (game.getName() == null || game.getGenres() == null || game.getPublicationDate() == null || game.getPlatform() == null) {
-                throw new IllegalArgumentException("Toutes les données requises ne sont pas fournies.");
-            }
+        Game game = new Game();
+        game.setName(input.getName());
+        game.setGenres(input.getGenres());
+        game.setPublicationDate(input.getPublicationDate());
+        game.setPlatform(input.getPlatform());
 
-            // Enregistrez le jeu dans le référentiel
-            return gameRepository.save(game);
-        } catch (IllegalArgumentException e) {
-            // Gérez l'exception d'argument illégal ici, par exemple, en la lançant à nouveau ou en effectuant un journal.
-            throw e;
-        } catch (Exception e) {
-            // Gérez d'autres exceptions qui pourraient survenir lors de la création du jeu ici.
-            // Vous pouvez également les logger pour le suivi des erreurs.
-            throw new RuntimeException("Une erreur s'est produite lors de la création du jeu.", e);
+        if (input.getEditorIds() != null) {
+            List<Editor> editors = editorRepository.findAllById(input.getEditorIds());
+            game.setEditors(editors);
         }
+
+        if (input.getStudioIds() != null) {
+            List<Studio> studios = studioRepository.findAllById(input.getStudioIds());
+            game.setStudios(studios);
+        }
+        return gameRepository.save(game);
     }
 
     public Game updateGame(String id, UpdateGameInput input) {
