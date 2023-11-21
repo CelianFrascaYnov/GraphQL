@@ -1,0 +1,98 @@
+type Query {
+    games(page: Int, genre: String, platform: String, studio: String): Games
+    game(id: Int!): Game
+    editors(page: Int): Editors
+    editor(id: Int!): Editor
+    studios(page: Int): Studios
+    studio(id: Int!): Studio
+}
+
+type Game {
+    id: Int
+    name: String!
+    genres: [String!]!
+    publicationDate: Int
+    editors: [Editor!]!
+    studios: [Studio!]!
+    platform: [String!]!
+}
+
+type Editor {
+    id: Int
+    name: String!
+    games: [Game]
+}
+
+type Studio {
+    id: Int
+    name: String!
+    games: [Game]
+}
+
+type Infos {
+    count: Int
+    pages: Int
+    nextPage: Int
+    previousPage: Int
+}
+
+type Games {
+    infos: Infos
+    results: [Game]
+}
+
+type Editors {
+    infos: Infos
+    results: [Editor]
+}
+
+type Studios {
+    infos: Infos
+    results: [Studio]
+}
+
+type Mutation {
+    createGame(input: CreateGameInput!): Game!
+    updateGame(id: Int!, input: UpdateGameInput!): Game!
+    deleteGame(id: Int!): Boolean!
+
+    createEditor(input: CreateEditorInput!): Editor!
+    updateEditor(id: Int!, input: UpdateEditorInput!): Editor!
+    deleteEditor(id: Int!): Boolean!
+
+    createStudio(input: CreateStudioInput!): Studio!
+    updateStudio(id: Int!, input: UpdateStudioInput!): Studio!
+    deleteStudio(id: Int!): Boolean!
+}
+
+input CreateGameInput {
+    name: String!
+    genres: [String!]!
+    publicationDate: Int
+    platform: [String!]!
+    editorIds: [String!]!
+    studioIds: [String!]!
+}
+
+input UpdateGameInput {
+    name: String
+    genres: [String!]
+    publicationDate: Int
+    platform: [String!]
+}
+
+input CreateEditorInput {
+    name: String!
+}
+
+input UpdateEditorInput {
+    name: String
+}
+
+input CreateStudioInput {
+    name: String!
+}
+
+input UpdateStudioInput {
+    name: String
+}
